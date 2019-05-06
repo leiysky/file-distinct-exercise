@@ -325,7 +325,7 @@ func Merge(metas []*FileMeta) {
 	}
 }
 
-func Lookup() []byte {
+func LookUp() []byte {
 	f, err := os.Open("temp/data")
 	if err != nil {
 		panic(err)
@@ -358,7 +358,7 @@ func FindFirstUniqueRecord() *Record {
 		return nil
 	}
 	Merge(metas)
-	result := Lookup()
+	result := LookUp()
 	if result == nil {
 		return nil
 	}
