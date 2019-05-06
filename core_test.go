@@ -36,26 +36,38 @@ func initTestData(data []string) {
 }
 
 func TestSolution(t *testing.T) {
+	defer func() {
+		if err := recover(); err != nil {
+			os.RemoveAll("temp")
+			os.Remove("data")
+			panic(err)
+		}
+	}()
+
 	initTestData(testSet1)
 	record := FindFirstUniqueRecord()
+	os.RemoveAll("temp")
 	os.Remove("data")
 	if string(record.Value) != "world" {
 		t.Errorf("FindFirstUniqueRecord failed: want record = %v; get record = %v", Record{5, []byte("world")}, record)
 	}
 	initTestData(testSet2)
 	record = FindFirstUniqueRecord()
+	os.RemoveAll("temp")
 	os.Remove("data")
 	if record != nil {
 		t.Errorf("FindFirstUniqueRecord failed: want record = nil; get record = %v", record)
 	}
 	initTestData(testSet3)
 	record = FindFirstUniqueRecord()
+	os.RemoveAll("temp")
 	os.Remove("data")
 	if record != nil {
 		t.Errorf("FindFirstUniqueRecord failed: want record = nil; get record = %v", record)
 	}
 	initTestData(testSet4)
 	record = FindFirstUniqueRecord()
+	os.RemoveAll("temp")
 	os.Remove("data")
 	if string(record.Value) != "hello" {
 		t.Errorf("FindFirstUniqueRecord failed: want record = %v; get record = %v", Record{5, []byte("hello")}, record)

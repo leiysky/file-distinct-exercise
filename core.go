@@ -1,7 +1,6 @@
 package find_first_unique
 
 import (
-	"crypto/md5"
 	"math/rand"
 	"os"
 )
@@ -80,52 +79,52 @@ func RandStringBytes(n int) string {
 	return string(b)
 }
 
-func FindFirstUniqueRecord() *Record {
-	f, err := os.Open("data")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	r := NewRecordReader(f)
-	m := NewOrderedMap()
-	var offset int64
-	for record, eof := r.ReadRecord(); !eof; record, eof = r.ReadRecord() {
-		h := md5.New()
-		h.Write(record.Value)
-		// calculate the signature to identify a record
-		sig := string(h.Sum(nil))
-		if _, ok := m.Get(sig); ok {
-			m.Put(sig, RecordMeta{
-				duplicate: true,
-			})
-		} else {
-			m.Put(sig, RecordMeta{
-				offset: offset,
-			})
-		}
-		offset += int64(record.Len + 4)
-	}
-	// lookup the first unique value
-	var result *RecordMeta
-	for {
-		v, ok := m.GetFirst()
-		if !ok {
-			break
-		}
-		meta := v.(RecordMeta)
-		if !meta.duplicate {
-			result = &meta
-			break
-		}
-		m.PopFirst()
-	}
-	if result == nil {
-		return nil
-	}
-	_, err = f.Seek(result.offset, 0)
-	if err != nil {
-		panic(err)
-	}
-	record, _ := r.ReadRecord()
-	return record
-}
+// func FindFirstUniqueRecord() *Record {
+// 	f, err := os.Open("data")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer f.Close()
+// 	r := NewRecordReader(f)
+// 	m := NewOrderedMap()
+// 	var offset int64
+// 	for record, eof := r.ReadRecord(); !eof; record, eof = r.ReadRecord() {
+// 		h := md5.New()
+// 		h.Write(record.Value)
+// 		// calculate the signature to identify a record
+// 		sig := string(h.Sum(nil))
+// 		if _, ok := m.Get(sig); ok {
+// 			m.Put(sig, RecordMeta{
+// 				duplicate: true,
+// 			})
+// 		} else {
+// 			m.Put(sig, RecordMeta{
+// 				offset: offset,
+// 			})
+// 		}
+// 		offset += int64(record.Len + 4)
+// 	}
+// 	// lookup the first unique value
+// 	var result *RecordMeta
+// 	for {
+// 		v, ok := m.GetFirst()
+// 		if !ok {
+// 			break
+// 		}
+// 		meta := v.(RecordMeta)
+// 		if !meta.duplicate {
+// 			result = &meta
+// 			break
+// 		}
+// 		m.PopFirst()
+// 	}
+// 	if result == nil {
+// 		return nil
+// 	}
+// 	_, err = f.Seek(result.offset, 0)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	record, _ := r.ReadRecord()
+// 	return record
+// }
