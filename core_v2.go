@@ -43,7 +43,7 @@ func compareSortedBuffer(a, b []byte) int {
 
 type FileMeta struct {
 	filename string
-	smallest []byte
+	// smallest []byte
 }
 
 type SortedFile struct {
@@ -108,7 +108,7 @@ func (itr *SortedFileIterator) EmitSmallest() {
 	itr.currentRecord = nil
 }
 
-// DUPLICATED: HasUniqueNext is like HasNext.
+// DEPRECATED: HasUniqueNext is like HasNext.
 // If we have phantom, just set nextRecord with phantom and return true.
 // If there is 0 element rest, which means no next, return false.
 // If there is 1 element rest, which means no duplicte elements rest, return true.
@@ -189,7 +189,7 @@ func (f *SortedFile) Flush() error {
 		return ErrSortedFileClosed
 	}
 	f.sortBuffer()
-	f.meta.smallest = f.buffer[0]
+	// f.meta.smallest = f.buffer[0]
 	w := NewRecordWriter(f.file)
 	for _, v := range f.buffer {
 		w.WriteRecord(&Record{
