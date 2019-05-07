@@ -36,6 +36,8 @@ func initTestData(data []string) {
 }
 
 func TestSolution(t *testing.T) {
+	// 4 bytes record length + 5 bytes content + 4 bytes ID
+	maxFileSize = 13
 	defer func() {
 		if err := recover(); err != nil {
 			os.RemoveAll("temp")
