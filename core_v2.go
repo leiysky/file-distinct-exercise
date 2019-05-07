@@ -175,13 +175,13 @@ func NewSortedFile(filename string) *SortedFile {
 	}
 }
 
-func (f *SortedFile) Write(p []byte) (n int, err error) {
+func (f *SortedFile) Write(p []byte) (n int, err error, isFull bool) {
 	if len(p)+f.currentSize > maxFileSize {
-		return 0, ErrSortedFileFull
+		return 0, nil, true
 	}
 	f.buffer = append(f.buffer, p)
 	f.currentSize += len(p)
-	return len(p), nil
+	return len(p), nil, false
 }
 
 func (f *SortedFile) Flush() error {
@@ -232,15 +232,22 @@ func SplitSourceFile(file *os.File) (metas []*FileMeta) {
 			return metas
 		}
 		recordNum++
-		_, err = f.Write(bytes.Join([][]byte{record.Value, Uint32ToBytes(uint32(recordNum))}, nil))
+		buff := bytes.Join([][]byte{record.Value, Uint32ToBytes(uint32(recordNum))}, nil)
+		_, err, isFull := f.Write(buff)
 		if err != nil {
-			if err == ErrSortedFileFull {
-				f.Flush()
-				f.Close()
-				metas = append(metas, f.meta)
-				fileNum++
-				f = NewSortedFile(getFileName(fileNum))
-			} else {
+			panic(err)
+		}
+		if isFull {
+			f.Flush()
+			f.Close()
+			metas = append(metas, f.meta)
+			fileNum++
+			f = NewSortedFile(getFileName(fileNum))
+			_, err, isFull := f.Write(buff)
+			if isFull {
+				panic("record is oversize")
+			}
+			if err != nil {
 				panic(err)
 			}
 		}
